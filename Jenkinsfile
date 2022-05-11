@@ -22,13 +22,14 @@ pipeline {
             }
           } //end of strategy
 
-      stage("Docker build image") {
+      stage("Docker build & push") {
             steps {
-              withCredentials([usernamePassword(credentialsId: 'priya-docker-secret', passwordVariable: 'pass', usernameVariable: 'user')]) {
+              withCredentials([usernamePassword(credentialsId: 'nexus-secret', passwordVariable: 'pass', usernameVariable: 'user')]) {
                 sh """ 
-                  sudo docker build -t priya4/appointme-admin-ui:${VERSION} .
-                  sudo docker login -u ${user} -p ${pass} 
-                  sudo docker push  priya4/appointme-admin-ui:${VERSION}
+                  
+                  sudo docker build -t 34.122.223.20:8082/appointme-admin-ui:${VERSION} .
+                  sudo docker login  -u ${user} -p ${pass} 34.122.223.20:8082
+                  sudo docker push 34.122.223.20:8082/appointme-admin-ui:${VERSION}
                 """
               }              
             }
