@@ -24,10 +24,10 @@ pipeline {
 
       stage("Docker build image") {
             steps {
-              withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'password', usernameVariable: 'user')]) {
+              withCredentials([usernamePassword(credentialsId: 'priya-docker-secret', passwordVariable: 'pass', usernameVariable: 'user')]) {
                 sh """ 
                   sudo docker build -t appy18/appointme-admin-ui:${VERSION} .
-                  sudo docker login -u ${user} -p ${password} 
+                  sudo docker login -u ${user} -p ${pass} 
                   sudo docker push  appy18/appointme-admin-ui:${VERSION}
                 """
               }              
