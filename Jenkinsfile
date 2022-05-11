@@ -28,7 +28,7 @@ pipeline {
                 sh """ 
                   sudo docker build -t appy18/appointme-admin-ui:${VERSION} .
                   sudo docker login -u ${user} -p ${pass} 
-                  sudo docker push  appy18/appointme-admin-ui:${VERSION}
+                  sudo docker push  priya4/appointme-admin-ui:${VERSION}
                 """
               }              
             }
