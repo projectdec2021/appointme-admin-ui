@@ -34,13 +34,5 @@ pipeline {
               }              
             }
           } //end of stage 
-
-      stage("Image scanning"){
-            steps{
-              script{
-                  sh "trivy image 34.122.223.20:8082/appointme-admin-ui > scanning.txt"
-                }
-              }
-            } //end of stage  
    }
 }
