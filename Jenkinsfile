@@ -1,8 +1,9 @@
 pipeline {
   agent any
   environment{
-        VERSION = "${env.BUILD_ID}"
         nexus_url = '35.232.16.59'
+        VERSION = "${env.BUILD_ID}"
+        
     } 
     stages {
       stage('SonarQube analysis') {
@@ -31,16 +32,18 @@ pipeline {
                   sudo docker build -t ${nexus_url}:8082/appointme-admin-ui:${VERSION} .
                   sudo docker login  -u ${user} -p ${pass} ${nexus_url}:8082
                   sudo docker push ${nexus_url}:8082/appointme-admin-ui:${VERSION}
-                 
-                """
+                 """
               }              
             }
           } //end of stage    
 
       stage("Trivy image scaning") {
             steps {
-              sh """ sudo trivy image ${nexus_url}:8082/appointme-admin-ui:${VERSION}
-               sudo docker rmi ${nexus_url}:8082/appointme-admin-ui:${VERSION}"""             
+              sh """ 
+               sudo trivy image ${nexus_url}:8082/appointme-admin-ui:${VERSION}
+               sudo docker rmi ${nexus_url}:8082/appointme-admin-ui:${VERSION}
+               
+               """             
             }
           } //end of stage
 
