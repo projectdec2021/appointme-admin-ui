@@ -2,6 +2,7 @@ pipeline {
   agent any
   environment{
         VERSION = "${env.BUILD_ID}"
+        nexus_url = '35.232.16.59'
     } 
     stages {
       stage('SonarQube analysis') {
@@ -27,12 +28,20 @@ pipeline {
               withCredentials([usernamePassword(credentialsId: 'nexus-secret', passwordVariable: 'pass', usernameVariable: 'user')]) {
                 sh """ 
                   
-                  sudo docker build -t 34.122.223.20:8082/appointme-admin-ui:${VERSION} .
-                  sudo docker login  -u ${user} -p ${pass} 34.122.223.20:8082
-                  sudo docker push 34.122.223.20:8082/appointme-admin-ui:${VERSION}
+                  sudo docker build -t ${nexus_url}:8082/appointme-admin-ui:${VERSION} .
+                  sudo docker login  -u ${user} -p ${pass} ${nexus_url}:8082
+                  sudo docker push ${nexus_url}:8082/appointme-admin-ui:${VERSION}
+                 
                 """
               }              
             }
-          } //end of stage 
-   }
-}
+          } //end of stage    
+
+      stage("Trivy image scaning") {
+            steps {
+              sh """ sudo trivy image ${nexus_url}:8082/appointme-admin-ui:${VERSION}
+               sudo docker rmi ${nexus_url}:8082/appointme-admin-ui:${VERSION}"""             
+            }
+          } //end of stage
+
+     }
