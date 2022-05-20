@@ -1,8 +1,9 @@
 pipeline {
   agent any
   environment{
+        date_format = new Date().format('dd-MM-yy-HHmm')
         nexus_url = '35.232.16.59'
-        VERSION = "${env.BUILD_ID}"
+        
         
     } 
     stages {
@@ -24,26 +25,26 @@ pipeline {
             }
           } //end of strategy
 
-      stage("Docker build & push") {
+      stage("Docker build") {
             steps {
-              withCredentials([usernamePassword(credentialsId: 'nexus-secret', passwordVariable: 'pass', usernameVariable: 'user')]) {
-                sh """ 
-                  
-                  sudo docker build -t ${nexus_url}:8082/appointme-admin-ui:${VERSION} .
-                  sudo docker login  -u ${user} -p ${pass} ${nexus_url}:8082
-                  sudo docker push ${nexus_url}:8082/appointme-admin-ui:${VERSION}
-                 """
-              }              
+              
+                sh """                
+                  sudo docker build -t ${nexus_url}:8082/appointme-admin-ui:${date_format} .                
+                """
+                            
             }
           } //end of stage    
 
-      stage("Trivy image scaning") {
+      stage("Trivy Docker scan & push") {
             steps {
+              withCredentials([usernamePassword(credentialsId: 'nexus-secret', passwordVariable: 'pass', usernameVariable: 'user')]) {
               sh """ 
-               sudo trivy image ${nexus_url}:8082/appointme-admin-ui:${VERSION}
-               sudo docker rmi ${nexus_url}:8082/appointme-admin-ui:${VERSION}
-               
-               """             
+              sudo trivy image ${nexus_url}:8082/appointme-admin-ui:${date_format} 
+              sudo docker login  -u ${user} -p ${pass} ${nexus_url}:8082
+              sudo docker push ${nexus_url}:8082/appointme-admin-ui:${date_format}
+              sudo docker rmi ${nexus_url}:8082/appointme-admin-ui:${date_format} 
+              """    
+              }             
             }
           } //end of stage
 
