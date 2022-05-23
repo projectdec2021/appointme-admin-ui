@@ -47,6 +47,19 @@ pipeline {
               }             
             }
           } //end of stage
+      
+      stage("Deploy to k8s cluster") {
+        
+          steps {
+            script {
+              if ("${env.BRANCH_NAME1}" == 'main') {
+                  withCredentials([kubeconfigFile(credentialsId: 'kubeconfig-cred', variable: 'KUBECONFIG')]) {       
+                     sh 'helm upgrade --install --set image.repository="${nexus_url}:8082/appointme-admin-ui" --set image.tag="${date_format}" appointme-admin-ui helmcharts/'             
+                  } 
+              }
+            }
+          }
+      } //end of stage
 
      }
 }
